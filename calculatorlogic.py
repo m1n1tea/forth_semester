@@ -9,7 +9,6 @@ def digit_to_char(digit):
 
 def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
     (num,denom)=fraction.as_integer_ratio()
-    print(num,denom)
     res=str()
     is_negative=0
 
