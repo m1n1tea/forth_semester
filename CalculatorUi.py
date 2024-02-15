@@ -32,7 +32,7 @@ form.setupUi(window)
 
 
 buttonLayout : QGridLayout = form.buttonLayout
-current_command: Command = Command(buttonLayout.itemAtPosition(0, 0).widget())
+current_command: Command = Command(buttonLayout.itemAtPosition(0, 1).widget())
 
 for row_index in range(buttonLayout.rowCount()): 
     for column_index in range(buttonLayout.columnCount()):
