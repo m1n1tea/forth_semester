@@ -13,13 +13,10 @@ class Command:
         return number.lstrip('0') 
 
     @staticmethod
+    # Repair after
     def separateNumber(number: str) -> str:
-        new_string : str = ""
-        
-        for i in range(len(number), 3):
-            new_string = number[i - 3:i] + " "
-        return new_string + number[]
-                
+        return number
+    
 
     def changeTo(self, other: int):
         self.number = other
