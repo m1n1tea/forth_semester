@@ -8,10 +8,25 @@ class Command:
     def __init__(self, commandLine : QLabel):
         self.commandLine = commandLine
 
+    @staticmethod
+    def lStripZero(number: str) -> str:
+        return number.lstrip('0') 
+
+    @staticmethod
+    def separateNumber(number: str) -> str:
+        new_string : str = ""
+        
+        for i in range(len(number), 3):
+            new_string = number[i - 3:i] + " "
+        return new_string + number[]
+                
+
     def changeTo(self, other: int):
         self.number = other
-        self.commandLine.setText(str(self.number))
+        self.commandLine.setText(Command.separateNumber(Command.lStripZero(self.commandLine.text() + str(self.number))))
         
+
+    
     def get(self) -> int: 
         return self.number
     
@@ -53,7 +68,7 @@ form.setupUi(window)
 
 buttonLayout : QGridLayout = form.buttonLayout
 
-#current_command: Command = Command(buttonLayout.itemAtPosition(0, 1).widget())
+current_command: Command = Command(buttonLayout.itemAtPosition(0, 1).widget())
 
 
 for row_index in range(buttonLayout.rowCount()): 
@@ -62,7 +77,7 @@ for row_index in range(buttonLayout.rowCount()):
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
                 button.clicked.connect(lambda checked, text=button.text(): current_command.changeTo(text))
+
 print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
 app.exec()
-print(current_command.get())
