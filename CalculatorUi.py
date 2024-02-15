@@ -4,9 +4,6 @@ from enum import *
 
 
 class Command:
-    def __init__(self, commandLine : QLabel):
-        self.commandLine = commandLine
-
     @staticmethod
     def lStripZero(number: str) -> str:
         return number.lstrip('0') 
@@ -21,13 +18,16 @@ class Command:
 
     def get(self):
         pass
-    
-    commandLine: QLabel = None
 
 class DigitCommand(Command): 
+    def __init__(self):
+        pass
+    def __init__(self, default):
+        self.changeTo(default)
+
     def changeTo(self, other: int):
         self.number = other
-        self.commandLine.setText(Command.separateNumber(Command.lStripZero(self.commandLine.text() + str(self.number))))
+       # self.commandLine.setText(Command.separateNumber(Command.lStripZero(self.commandLine.text() + str(self.number))))
 
     
     def get(self) -> int: 
@@ -36,6 +36,16 @@ class DigitCommand(Command):
     number : int = 0
    
 class OperationCommand(Command):
+    def __init__(self):
+        pass
+    def __init__(self, operation):
+        self.changeTo(operation)
+
+    @staticmethod 
+    def checkIfPossible(operation: str) -> bool:
+        operations = {"+", "-", "/", "*"}
+        return operation in operations
+    
     class PossibleOperation(Enum):
         NONE = "0"
         ADDITION = "+"
@@ -67,6 +77,16 @@ class ClearCommand(Command):
     
     def get(self):
         return "C"
+    
+class CommandFactory:
+    @staticmethod
+    def constructFromString(command: str) -> Command:
+        if command.isdigit():
+            return DigitCommand(int(command))
+        elif OperationCommand.checkIfPossible(command):
+            return OperationCommand(command)
+        elif command == "C":
+            return ClearCommand()
 
 class CommandHistory: 
     def __init__(self, commandLine: QLabel):
@@ -102,10 +122,17 @@ window = Window()
 form = Form()
 form.setupUi(window)
 
+def findChildOfAName(parent, type, name: str):
+    children = parent.findChildren(type)
+    for i in range(len(children)):
+        if children[i].objectName() == name:
+            return children[i]
+    return None
 
-buttonLayout : QGridLayout = form.buttonLayout
+buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
 
-current_command: Command = Command(buttonLayout.itemAtPosition(0, 1).widget())
+#findChildOfAName(form.whole_calculator, QLabel, "result")
+current_command: Command = CommandFactory.constructFromString("0")
 
 
 for row_index in range(buttonLayout.rowCount()): 
@@ -113,7 +140,7 @@ for row_index in range(buttonLayout.rowCount()):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                button.clicked.connect(lambda checked, text=button.text(): current_command.changeTo(text))
+                button.clicked.connect(lambda checked, text=button.text(): print(type(CommandFactory.constructFromString(text))))
 
 print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
