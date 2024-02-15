@@ -52,12 +52,16 @@ class CalculatorLogic:
 
     def input_number(self, number : str):
         (integer_part,fractional_part)=number.split('.')
-        denom=self.number_system**len(fractional_part)
-        num=int(fractional_part,self.number_system)+int(integer_part,self.number_system)*denom
+        denom = self.number_system**len(fractional_part)
+        num = int(integer_part, self.number_system)*denom
+        if number[0] != '-':
+            num += int(fractional_part, self.number_system)
+        else:
+            num -= int(fractional_part, self.number_system)
 
-        if (self.input_fraction =="main"):
-            self.main_fraction=Fraction(num,denom)
-        if (self.input_fraction =="secondary"):
+        if self.input_fraction == "main":
+            self.main_fraction = Fraction(num,denom)
+        if self.input_fraction == "secondary":
             self.secondary_fraction = Fraction(num, denom)
 
     def input_operator(self, operator_symbol : str):
@@ -77,7 +81,7 @@ class CalculatorLogic:
         if self.operator_symbol=='+':
             self.main_fraction+=self.secondary_fraction
         if self.operator_symbol=='-':
-            self.main_fraction-=self.secondary_fraction
+            self.main_fraction=abs(self.main_fraction-self.secondary_fraction)
         if self.operator_symbol=='*':
             self.main_fraction*=self.secondary_fraction
         if self.operator_symbol=='/':
