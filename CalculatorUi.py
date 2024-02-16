@@ -2,7 +2,8 @@ from calculatorlogic import *
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from enum import * 
-
+from PyQt6.QtGui import QKeySequence, QKeyEvent, QShortcut
+from PyQt6 import QtCore
 def to_base(number, base):
     base_string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     result = ""
@@ -315,10 +316,19 @@ for row_index in range(buttonLayout.rowCount()):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
+                    
+                    if (button.text == "⌫"):
+                        # Does not work forsome reason
+                        button.shortcut = QShortcut(QtCore.Qt.Key.Key_Backspace, button)
+                    else:
+                        button.shortcut = QShortcut(QKeySequence(button.text()), button)
+                    button.shortcut.activated.connect(lambda text=button.text(): CommandFactory.constructFromString(text))
+                    button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
 
 for i in range (chars.count()):
     button = chars.itemAt(i).widget()
+    button.shortcut = QShortcut(QKeySequence(button.text().lower()), button)
+    button.shortcut.activated.connect(lambda text=button.text(): CommandFactory.constructFromString(text))
     button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
     button.setDisabled(True)
 
