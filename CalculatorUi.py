@@ -220,7 +220,6 @@ class EqualCommand(Command):
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
         result= calculate(OperationQueue.queue)
-        print(result)
         mainCommandLine.setText(result)
         mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()

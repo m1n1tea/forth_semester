@@ -55,7 +55,9 @@ class CalculatorLogic:
         dot_index=number.find('.')
         num=0
         denom=1
-        if (dot_index==-1):
+        if number=='':
+            pass
+        elif (dot_index==-1):
             num=int(number,self.number_system)
         else:
             (integer_part,fractional_part)=number.split('.')
@@ -70,16 +72,20 @@ class CalculatorLogic:
             self.main_fraction = Fraction(num,denom)
         if self.input_fraction == "secondary":
             self.secondary_fraction = Fraction(num, denom)
+        print(self.main_fraction)
+        print(self.secondary_fraction)
+        print(self.input_fraction)
 
     def input_operator(self, operator_symbol : str):
 
-        if operator_symbol in ['+','-','*','/','=']:
+        if operator_symbol in ['+','-','*','/']:
             self.input_fraction="secondary"
+        if operator_symbol in ['C','=']:
+            self.input_fraction="main"
 
         if operator_symbol == 'C':
             self.main_fraction = Fraction()
             self.secondary_fraction = Fraction()
-            self.input_fraction = "main"
             return
 
         if operator_symbol != '=':
@@ -87,13 +93,19 @@ class CalculatorLogic:
 
         if self.operator_symbol=='+':
             self.main_fraction+=self.secondary_fraction
+            self.secondary_fraction=Fraction()
         if self.operator_symbol=='-':
             self.main_fraction=abs(self.main_fraction-self.secondary_fraction)
+            self.secondary_fraction = Fraction()
         if self.operator_symbol=='*':
             self.main_fraction*=self.secondary_fraction
+            self.secondary_fraction = Fraction()
         if self.operator_symbol=='/':
-            print(self.main_fraction,self.secondary_fraction)
             self.main_fraction/=self.secondary_fraction
+            self.secondary_fraction = Fraction()
+        print(self.main_fraction)
+        print(self.secondary_fraction)
+        print(self.input_fraction)
 
 
     def get_main_fraction(self) -> str :
