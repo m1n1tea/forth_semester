@@ -2,6 +2,13 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from enum import * 
 
+def to_base(number, base):
+    base_string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    result = ""
+    while number:
+        result += base_string[number % base]
+        number //= base
+    return result[::-1] or "0"
 
 class Command:
     @staticmethod
@@ -23,8 +30,10 @@ class CommandHistory:
     def push(self, command: Command):
         self.__commands.append(command)
     
-    def top(self) -> Command:
-        return self.__commands[-1]
+    def top(self) -> Command | None:
+        if len(self.__commands) > 0:
+            return self.__commands[-1]
+        return None
     
     def getCurrentCommand(self) -> Command: 
         return self.top()
@@ -52,23 +61,40 @@ class CommandLine:
         self.__line = label
     
     def appendDigit(self, digit: int):
-        self.__line.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
-    
+        self.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
+        
     def setText(self, text: str):
+        if text.isdigit():
+            self.original_number_in_base_10 = int(text)
         self.__line.setText(text)
      
     def clear(self):
         self.setText("0")
 
+    def changeBase(self, new_base: int):
+       self.base = new_base
+       self.__line.setText(to_base(int(self.original_number_in_base_10), self.base))
+        
     def getText(self) -> str:
         return self.__line.text()
 
     __line : QLabel = None
+    original_number_in_base_10 : int = 0
+    base : int = 10
+
+
+class NumberSystemLine(CommandLine):
+    def setText(self, text: str):
+        self.current_number_system = int(text)
+        return super().setText(self.template + text)
+    template: str = "Number System: "
+    current_number_system: int = 10
 
 
 commandHistory : CommandHistory = CommandHistory()
 mainCommandLine : CommandLine = CommandLine()
 historyCommandLine : CommandLine = CommandLine()
+numberSystemLine : NumberSystemLine = NumberSystemLine()
 
 class DigitCommand(Command): 
     def __init__(self):
@@ -135,7 +161,7 @@ class OperationCommand(Command):
         
         OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
         historyCommandLine.setText(OperationQueue.queue)
-        mainCommandLine.clear()
+        #mainCommandLine.clear()
 
     def get(self):
         return self.__currentOperation.value
@@ -146,13 +172,28 @@ class OperationCommand(Command):
 def calculate(something: str) -> str:
     return something
 
+class BackspaceCommand(Command):
+    def __init__(self, something):
+        self.changeTo(something)
+
+    def changeTo(self, other: str) -> None:
+        if not mainCommandLine.isEmpty():
+            mainCommandLine.setText(mainCommandLine.getText()[0:-1])
+            if mainCommandLine.isEmpty():
+                mainCommandLine.setText("0")
+        super().changeTo(other)
+    
+    def get(self):
+        return 
+
+
 class EqualCommand(Command):
     def __init__(self, operation):
         self.changeTo(operation)
 
     def changeTo(self, other: str) -> None:
         if not mainCommandLine.isEmpty():
-            OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
+            OperationQueue.appendToQueue(str(mainCommandLine.original_number_in_base_10) + self.get())
         elif not OperationQueue.isEmpty():
             OperationQueue.appendToQueue(self.get())
 
@@ -165,7 +206,9 @@ class EqualCommand(Command):
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
         result : int = calculate("12")
+        
         mainCommandLine.setText(result)
+        mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()
         OperationQueue.appendToQueue(result)
         super().changeTo(other)
@@ -196,6 +239,8 @@ class CommandFactory:
             return ClearCommand()
         elif command == "=":
             return EqualCommand(command)
+        elif command == "⌫":
+            return BackspaceCommand(command)
 
 def findChildOfAName(parent, type, name: str):
     children = parent.findChildren(type)
@@ -217,8 +262,17 @@ form.setupUi(window)
 
 mainCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "result"))
 historyCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "previous_input"))
+numberSystemLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "label"))
+
 
 buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
+
+def onSliderValueChange(new_value: str):
+    numberSystemLine.setText(new_value)
+    mainCommandLine.changeBase(int(new_value))
+
+slider : QSlider = findChildOfAName(form.whole_calculator, QSlider, "horizontalSlider")
+slider.valueChanged.connect(lambda : onSliderValueChange(str(slider.value())))
 
 for row_index in range(buttonLayout.rowCount()): 
     for column_index in range(buttonLayout.columnCount() + 2):
