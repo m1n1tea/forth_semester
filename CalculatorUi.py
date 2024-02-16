@@ -98,6 +98,8 @@ historyCommandLine : CommandLine = CommandLine()
 numberSystemLine : NumberSystemLine = NumberSystemLine()
 
 class DigitCommand(Command): 
+    digitsAfter9="ABCDEF"
+
     def __init__(self):
         pass
     def __init__(self, default):
@@ -160,9 +162,9 @@ class OperationCommand(Command):
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
         
-        OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
+        OperationQueue.appendToQueue(str(mainCommandLine.original_number_in_base_10) + self.get())
         historyCommandLine.setText(OperationQueue.queue)
-        #mainCommandLine.clear()
+        mainCommandLine.clear()
 
     def get(self):
         return self.__currentOperation.value
@@ -203,15 +205,19 @@ class EqualCommand(Command):
         if isinstance(commandHistory.top(), OperationCommand):
             temp_str = OperationQueue.queue 
             OperationQueue.clearQueue()
-            OperationQueue.appendToQueue(temp_str[0:-2] + self.get())        
+            OperationQueue.appendToQueue(temp_str[0:-2] + self.get()) 
+        elif isinstance(commandHistory.top(), EqualCommand):
+            return      
+        
+        
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
-        result : int = calculate("12")
+        result : int = calculate(OperationQueue.queue)
         
         mainCommandLine.setText(result)
         mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()
-        OperationQueue.appendToQueue(result)
+        #OperationQueue.appendToQueue(result)
         super().changeTo(other)
     
     def get(self):
@@ -271,6 +277,20 @@ buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "b
 def onSliderValueChange(new_value: str):
     numberSystemLine.setText(new_value)
     mainCommandLine.changeBase(int(new_value))
+    if buttonLayout is None:
+        return
+    for row_index in range(buttonLayout.rowCount()): 
+        for column_index in range(buttonLayout.columnCount() + 2):
+            if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
+                button = buttonLayout.itemAtPosition(column_index, row_index).widget()
+                if isinstance(button, QPushButton) and not button.text().isdigit():
+                    continue
+                if isinstance(button, QPushButton) and int(button.text()) < int(new_value):
+                    button.setEnabled(True)
+                    #button.setStyleSheet("background-color: gray")
+                elif int(button.text()) >= int(new_value):
+                    button.setDisabled(True)
+                    
 
 slider : QSlider = findChildOfAName(form.whole_calculator, QSlider, "horizontalSlider")
 slider.valueChanged.connect(lambda : onSliderValueChange(str(slider.value())))
