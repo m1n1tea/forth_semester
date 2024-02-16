@@ -62,13 +62,11 @@ class CommandLine:
         self.__line = label
     
     def appendDigit(self, digit: int):
-        if (digit >= self.base):
-            return
         self.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
         
     def setText(self, text: str):
-        #if text.isdigit():
-          #  self.original_number_in_base_10 = int(text)
+        if text.isdigit():
+            self.original_number_in_base_10 = int(text)
         self.__line.setText(text)
      
     def clear(self):
@@ -100,6 +98,8 @@ historyCommandLine : CommandLine = CommandLine()
 numberSystemLine : NumberSystemLine = NumberSystemLine()
 
 class DigitCommand(Command): 
+    digitsAfter9="ABCDEF"
+
     def __init__(self):
         pass
     def __init__(self, default):
@@ -162,9 +162,9 @@ class OperationCommand(Command):
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
         
-        OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
+        OperationQueue.appendToQueue(str(mainCommandLine.original_number_in_base_10) + self.get())
         historyCommandLine.setText(OperationQueue.queue)
-        #mainCommandLine.clear()
+        mainCommandLine.clear()
 
     def get(self):
         return self.__currentOperation.value
@@ -205,15 +205,19 @@ class EqualCommand(Command):
         if isinstance(commandHistory.top(), OperationCommand):
             temp_str = OperationQueue.queue 
             OperationQueue.clearQueue()
-            OperationQueue.appendToQueue(temp_str[0:-2] + self.get())        
+            OperationQueue.appendToQueue(temp_str[0:-2] + self.get()) 
+        elif isinstance(commandHistory.top(), EqualCommand):
+            return      
+        
+        
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
-        result : int = calculate("12")
+        result : int = calculate(OperationQueue.queue)
         
         mainCommandLine.setText(result)
         mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()
-        OperationQueue.appendToQueue(result)
+        #OperationQueue.appendToQueue(result)
         super().changeTo(other)
     
     def get(self):
