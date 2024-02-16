@@ -26,7 +26,7 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
     if is_negative:
         res+='-'
     res=res[::-1]
-    if (len(res)==0 and num!=0):
+    if (len(res)==0):
         res+='0'
     if (len(res)+1<max_len and num!=0):
         res+='.'
@@ -88,21 +88,16 @@ class CalculatorLogic:
             self.secondary_fraction = Fraction()
             return
 
-        if operator_symbol != '=':
-            self.operator_symbol = operator_symbol
-
         if self.operator_symbol=='+':
             self.main_fraction+=self.secondary_fraction
-            self.secondary_fraction=Fraction()
         if self.operator_symbol=='-':
             self.main_fraction=abs(self.main_fraction-self.secondary_fraction)
-            self.secondary_fraction = Fraction()
         if self.operator_symbol=='*':
             self.main_fraction*=self.secondary_fraction
-            self.secondary_fraction = Fraction()
         if self.operator_symbol=='/':
             self.main_fraction/=self.secondary_fraction
-            self.secondary_fraction = Fraction()
+
+        self.operator_symbol = operator_symbol
         print(self.main_fraction)
         print(self.secondary_fraction)
         print(self.input_fraction)
