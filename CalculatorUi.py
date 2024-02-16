@@ -1,15 +1,9 @@
+import calculatorlogic
 from calculatorlogic import *
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from enum import * 
 
-def to_base(number, base):
-    base_string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    result = ""
-    while number:
-        result += base_string[number % base]
-        number //= base
-    return result[::-1] or "0"
 
 class Command:
     @staticmethod
@@ -65,22 +59,20 @@ class CommandLine:
         self.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
         
     def setText(self, text: str):
-        if text.isdigit():
-            self.original_number_in_base_10 = int(text)
         self.__line.setText(text)
      
     def clear(self):
         self.setText("0")
 
     def changeBase(self, new_base: int):
-       self.base = new_base
-       self.__line.setText(to_base(int(self.original_number_in_base_10), self.base))
+        calculator_logic.input_number_system(new_base)
+        self.base = new_base
+        self.__line.setText(calculator_logic.get_main_fraction())
         
     def getText(self) -> str:
         return self.__line.text()
 
     __line : QLabel = None
-    original_number_in_base_10 : int = 0
     base : int = 10
 
 
@@ -109,6 +101,7 @@ class DigitCommand(Command):
         self.number = other
         mainCommandLine.appendDigit(int(other))
         super().changeTo(other)
+        calculator_logic.input_number(mainCommandLine.getText())
        
     def get(self) -> int: 
         return self.number
@@ -161,8 +154,10 @@ class OperationCommand(Command):
             case _:
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
-        
-        OperationQueue.appendToQueue(str(mainCommandLine.original_number_in_base_10) + self.get())
+        print(mainCommandLine.getText())
+        calculator_logic.input_number(mainCommandLine.getText())
+        calculator_logic.input_operator(other)
+        OperationQueue.appendToQueue(str(mainCommandLine.getText()) + self.get())
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
 
@@ -173,7 +168,7 @@ class OperationCommand(Command):
     
 # Placeholder
 def calculate(something: str) -> str:
-    return something
+    return calculator_logic.get_main_fraction()
 
 class BackspaceCommand(Command):
     def __init__(self, something):
@@ -195,8 +190,10 @@ class EqualCommand(Command):
         self.changeTo(operation)
 
     def changeTo(self, other: str) -> None:
+        calculator_logic.input_number(mainCommandLine.getText())
+        calculator_logic.input_operator('=')
         if not mainCommandLine.isEmpty():
-            OperationQueue.appendToQueue(str(mainCommandLine.original_number_in_base_10) + self.get())
+            OperationQueue.appendToQueue(str(mainCommandLine.getText()) + self.get())
         elif not OperationQueue.isEmpty():
             OperationQueue.appendToQueue(self.get())
 
@@ -212,8 +209,8 @@ class EqualCommand(Command):
         
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
-        result : int = calculate(OperationQueue.queue)
-        
+        result= calculate(OperationQueue.queue)
+        print(result)
         mainCommandLine.setText(result)
         mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()
@@ -231,6 +228,7 @@ class ClearCommand(Command):
         mainCommandLine.clear()
         historyCommandLine.clear()
         OperationQueue.clearQueue()
+        calculator_logic.input_operator("C")
     
     def get(self):
         return "C"
@@ -270,6 +268,8 @@ form.setupUi(window)
 mainCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "result"))
 historyCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "previous_input"))
 numberSystemLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "label"))
+
+calculator_logic = calculatorlogic.CalculatorLogic()
 
 
 buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
