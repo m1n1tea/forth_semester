@@ -14,10 +14,61 @@ class Command:
         return number
     
     def changeTo(self, other: str) -> None:
-        pass
+        commandHistory.push(self)
 
     def get(self):
         pass
+
+class CommandHistory:         
+    def push(self, command: Command):
+        self.__commands.append(command)
+    
+    def top(self) -> Command:
+        return self.__commands[-1]
+    
+    def getCurrentCommand(self) -> Command: 
+        return self.top()
+    
+    # Returns the last command used
+    def pop(self) -> Command:
+        last_command_used: Command = self.top()
+        self.__commands.pop()
+        return last_command_used
+    
+    def debugGetCommands(self):
+        return self.__commands
+    
+    __commands: list[Command] = []
+
+
+class CommandLine:
+    def __init__(self):
+        pass
+
+    def isEmpty(self) -> bool:
+        return len(Command.lStripZero(self.getText())) == 0
+    
+    def setLabel(self, label: QLabel):
+        self.__line = label
+    
+    def appendDigit(self, digit: int):
+        self.__line.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
+    
+    def setText(self, text: str):
+        self.__line.setText(text)
+     
+    def clear(self):
+        self.setText("0")
+
+    def getText(self) -> str:
+        return self.__line.text()
+
+    __line : QLabel = None
+
+
+commandHistory : CommandHistory = CommandHistory()
+mainCommandLine : CommandLine = CommandLine()
+historyCommandLine : CommandLine = CommandLine()
 
 class DigitCommand(Command): 
     def __init__(self):
@@ -27,15 +78,30 @@ class DigitCommand(Command):
 
     def changeTo(self, other: int):
         self.number = other
-       # self.commandLine.setText(Command.separateNumber(Command.lStripZero(self.commandLine.text() + str(self.number))))
-
-    
+        mainCommandLine.appendDigit(int(other))
+        super().changeTo(other)
+       
     def get(self) -> int: 
         return self.number
     
     number : int = 0
    
+class OperationQueue:
+    @staticmethod
+    def appendToQueue(text : str):
+        OperationQueue.queue += text
+    @staticmethod
+    def isEmpty() -> bool:
+        return len(Command.lStripZero(OperationQueue.queue)) == 0
+           
+        
+    @staticmethod
+    def clearQueue():
+        OperationQueue.queue = ""
+    
+    queue : str = ""
 class OperationCommand(Command):
+
     def __init__(self):
         pass
     def __init__(self, operation):
@@ -65,15 +131,56 @@ class OperationCommand(Command):
                 self.__currentOperation = self.PossibleOperation.MULTIPLICATION
             case _:
                 raise ValueError(other + " was not one of Possible Operations")
+        super().changeTo(other)
+        
+        OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
+        historyCommandLine.setText(OperationQueue.queue)
+        mainCommandLine.clear()
 
     def get(self):
         return self.__currentOperation.value
     
     __currentOperation : PossibleOperation = None
     
+# Placeholder
+def calculate(something: str) -> str:
+    return something
+
+class EqualCommand(Command):
+    def __init__(self, operation):
+        self.changeTo(operation)
+
+    def changeTo(self, other: str) -> None:
+        if not mainCommandLine.isEmpty():
+            OperationQueue.appendToQueue(mainCommandLine.getText() + self.get())
+        elif not OperationQueue.isEmpty():
+            OperationQueue.appendToQueue(self.get())
+
+        # Here we delete a sign if the last command was something of a "+, -, /, *", since we do not
+        # want to find something like: "65-=65"
+        if isinstance(commandHistory.top(), OperationCommand):
+            temp_str = OperationQueue.queue 
+            OperationQueue.clearQueue()
+            OperationQueue.appendToQueue(temp_str[0:-2] + self.get())        
+        historyCommandLine.setText(OperationQueue.queue)
+        mainCommandLine.clear()
+        result : int = calculate("12")
+        mainCommandLine.setText(result)
+        OperationQueue.clearQueue()
+        OperationQueue.appendToQueue(result)
+        super().changeTo(other)
+    
+    def get(self):
+        return "="
+    
 class ClearCommand(Command):
+    def __init__(self):
+        return self.changeTo(None)
+    
     def changeTo(self, other) -> None:
-        return super().changeTo(other)
+        mainCommandLine.clear()
+        historyCommandLine.clear()
+        OperationQueue.clearQueue()
     
     def get(self):
         return "C"
@@ -87,40 +194,8 @@ class CommandFactory:
             return OperationCommand(command)
         elif command == "C":
             return ClearCommand()
-
-class CommandHistory: 
-    def __init__(self, commandLine: QLabel):
-        self.commandLine = commandLine
-
-    def push(self, command: Command):
-        self.commands.append(command)
-    
-    def top(self) -> Command:
-        return self.commands[-1]
-    
-    def getCurrentCommand(self) -> Command: 
-        return self.top()
-    
-    # Returns the last command used
-    def pop(self) -> Command:
-        last_command_used: Command = self.top()
-        self.commands.pop()
-        return last_command_used
-
-
-    commands: list[Command]
-    commandLine: QLabel = None
-
-
-app = QApplication([])
-
-# Cannot annotate types here for some reason
-Form, Window = uic.loadUiType("./UI/calculator.ui")
-
-
-window = Window()
-form = Form()
-form.setupUi(window)
+        elif command == "=":
+            return EqualCommand(command)
 
 def findChildOfAName(parent, type, name: str):
     children = parent.findChildren(type)
@@ -129,18 +204,28 @@ def findChildOfAName(parent, type, name: str):
             return children[i]
     return None
 
+
+# Setup
+app = QApplication([])
+
+# Cannot annotate types here for some reason
+Form, Window = uic.loadUiType("./UI/calculator.ui")
+
+window = Window()
+form = Form()
+form.setupUi(window)
+
+mainCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "result"))
+historyCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "previous_input"))
+
 buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
-
-#findChildOfAName(form.whole_calculator, QLabel, "result")
-current_command: Command = CommandFactory.constructFromString("0")
-
 
 for row_index in range(buttonLayout.rowCount()): 
     for column_index in range(buttonLayout.columnCount() + 2):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                button.clicked.connect(lambda checked, text=button.text(): print(type(CommandFactory.constructFromString(text))))
+                button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
 
 print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
