@@ -61,11 +61,13 @@ class CommandLine:
         self.__line = label
     
     def appendDigit(self, digit: int):
+        if (digit >= self.base):
+            return
         self.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
         
     def setText(self, text: str):
-        if text.isdigit():
-            self.original_number_in_base_10 = int(text)
+        #if text.isdigit():
+          #  self.original_number_in_base_10 = int(text)
         self.__line.setText(text)
      
     def clear(self):
@@ -270,6 +272,20 @@ buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "b
 def onSliderValueChange(new_value: str):
     numberSystemLine.setText(new_value)
     mainCommandLine.changeBase(int(new_value))
+    if buttonLayout is None:
+        return
+    for row_index in range(buttonLayout.rowCount()): 
+        for column_index in range(buttonLayout.columnCount() + 2):
+            if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
+                button = buttonLayout.itemAtPosition(column_index, row_index).widget()
+                if isinstance(button, QPushButton) and not button.text().isdigit():
+                    continue
+                if isinstance(button, QPushButton) and int(button.text()) < int(new_value):
+                    button.setDisabled(False)
+                    button.setStyleSheet("background-color: gray")
+                elif int(button.text()) > int(new_value):
+                    button.setEnabled(True)
+                    
 
 slider : QSlider = findChildOfAName(form.whole_calculator, QSlider, "horizontalSlider")
 slider.valueChanged.connect(lambda : onSliderValueChange(str(slider.value())))
