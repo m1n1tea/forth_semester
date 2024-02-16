@@ -4,6 +4,9 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from enum import * 
 
+from PyQt6.QtGui import QKeySequence, QKeyEvent, QShortcut
+from PyQt6 import QtCore
+
 
 class Command:
     @staticmethod
@@ -90,16 +93,23 @@ historyCommandLine : CommandLine = CommandLine()
 numberSystemLine : NumberSystemLine = NumberSystemLine()
 
 class DigitCommand(Command): 
-    digitsAfter9="ABCDEF"
+    digitsAfter9={"a", "b", "c", "d", "e", "f"}
 
+    @staticmethod
+    def checkIfAvailable(command:str) -> bool:
+        for i in range(len(command)):
+            if not (command[i].isdigit() or command[i] in DigitCommand.digitsAfter9):
+                return False
+        return True
+    
     def __init__(self):
         pass
     def __init__(self, default):
         self.changeTo(default)
 
-    def changeTo(self, other: int):
-        self.number = other
-        mainCommandLine.appendDigit(int(other))
+    def changeTo(self, other:str):
+        self.number = int(other, numberSystemLine.current_number_system)
+        mainCommandLine.appendDigit(other)
         super().changeTo(other)
         calculator_logic.input_number(mainCommandLine.getText())
        
@@ -234,13 +244,14 @@ class ClearCommand(Command):
         return "C"
     
 class CommandFactory:
+    
     @staticmethod
     def constructFromString(command: str) -> Command:
-        if command.isdigit():
-            return DigitCommand(int(command))
+        if DigitCommand.checkIfAvailable(command.lower()):
+            return DigitCommand(command)
         elif OperationCommand.checkIfPossible(command):
             return OperationCommand(command)
-        elif command == "C":
+        elif command == "Clear":
             return ClearCommand()
         elif command == "=":
             return EqualCommand(command)
@@ -273,6 +284,7 @@ calculator_logic = calculatorlogic.CalculatorLogic()
 
 
 buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
+chars : QHBoxLayout = findChildOfAName(form.whole_calculator, QGroupBox, "horizontalGroupBox").layout()
 
 def onSliderValueChange(new_value: str):
     numberSystemLine.setText(new_value)
@@ -290,7 +302,13 @@ def onSliderValueChange(new_value: str):
                     #button.setStyleSheet("background-color: gray")
                 elif int(button.text()) >= int(new_value):
                     button.setDisabled(True)
-                    
+    for i in range (chars.count()):
+        button = chars.itemAt(i).widget()
+        result = list(DigitCommand.digitsAfter9).index(button.text().lower())
+        if (result +  10 < int(new_value)):
+            chars.itemAt(5 - result).widget().setEnabled(True)
+        else:
+            chars.itemAt(5 - result).widget().setEnabled(False)
 
 slider : QSlider = findChildOfAName(form.whole_calculator, QSlider, "horizontalSlider")
 slider.valueChanged.connect(lambda : onSliderValueChange(str(slider.value())))
@@ -300,7 +318,21 @@ for row_index in range(buttonLayout.rowCount()):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
+                    
+                    if (button.text == "⌫"):
+                        # Does not work forsome reason
+                        button.shortcut = QShortcut(QtCore.Qt.Key.Key_Backspace, button)
+                    else:
+                        button.shortcut = QShortcut(QKeySequence(button.text()), button)
+                    button.shortcut.activated.connect(lambda text=button.text(): CommandFactory.constructFromString(text))
+                    button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
+
+for i in range (chars.count()):
+    button = chars.itemAt(i).widget()
+    button.shortcut = QShortcut(QKeySequence(button.text().lower()), button)
+    button.shortcut.activated.connect(lambda text=button.text(): CommandFactory.constructFromString(text))
+    button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
+    button.setDisabled(True)
 
 print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
