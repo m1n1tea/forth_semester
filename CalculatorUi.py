@@ -320,6 +320,7 @@ for row_index in range(buttonLayout.rowCount()):
 for i in range (chars.count()):
     button = chars.itemAt(i).widget()
     button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
+    button.setDisabled(True)
 
 print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
