@@ -282,10 +282,10 @@ def onSliderValueChange(new_value: str):
                 if isinstance(button, QPushButton) and not button.text().isdigit():
                     continue
                 if isinstance(button, QPushButton) and int(button.text()) < int(new_value):
-                    button.setDisabled(False)
-                    button.setStyleSheet("background-color: gray")
-                elif int(button.text()) > int(new_value):
                     button.setEnabled(True)
+                    #button.setStyleSheet("background-color: gray")
+                elif int(button.text()) >= int(new_value):
+                    button.setDisabled(True)
                     
 
 slider : QSlider = findChildOfAName(form.whole_calculator, QSlider, "horizontalSlider")
