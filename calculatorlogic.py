@@ -26,7 +26,8 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
     if is_negative:
         res+='-'
     res=res[::-1]
-
+    if (len(res)==0 and num!=0):
+        res+='0'
     if (len(res)+1<max_len and num!=0):
         res+='.'
     while (len(res)<max_len and num!=0):
@@ -45,19 +46,25 @@ class CalculatorLogic:
         self.operator_symbol = 'c' # +,-,*,/,= - easy, c - clear all(except number system)
         self.input_fraction = "main"  # main - main_fraction, secondary - secondary_fraction
         self.number_system = 10
-        self.max_number_len = 100
+        self.max_number_len = 10
 
     def input_number_system(self, number_system):
         self.number_system=int(number_system)
 
     def input_number(self, number : str):
-        (integer_part,fractional_part)=number.split('.')
-        denom = self.number_system**len(fractional_part)
-        num = int(integer_part, self.number_system)*denom
-        if number[0] != '-':
-            num += int(fractional_part, self.number_system)
+        dot_index=number.find('.')
+        num=0
+        denom=1
+        if (dot_index==-1):
+            num=int(number,self.number_system)
         else:
-            num -= int(fractional_part, self.number_system)
+            (integer_part,fractional_part)=number.split('.')
+            denom = self.number_system**len(fractional_part)
+            num = int(integer_part, self.number_system)*denom
+            if number[0] != '-':
+                num += int(fractional_part, self.number_system)
+            else:
+                num -= int(fractional_part, self.number_system)
 
         if self.input_fraction == "main":
             self.main_fraction = Fraction(num,denom)
@@ -69,14 +76,14 @@ class CalculatorLogic:
         if operator_symbol in ['+','-','*','/','=']:
             self.input_fraction="secondary"
 
-        if operator_symbol == 'c':
+        if operator_symbol == 'C':
             self.main_fraction = Fraction()
             self.secondary_fraction = Fraction()
             self.input_fraction = "main"
+            return
 
         if operator_symbol != '=':
             self.operator_symbol = operator_symbol
-            return
 
         if self.operator_symbol=='+':
             self.main_fraction+=self.secondary_fraction
@@ -85,6 +92,7 @@ class CalculatorLogic:
         if self.operator_symbol=='*':
             self.main_fraction*=self.secondary_fraction
         if self.operator_symbol=='/':
+            print(self.main_fraction,self.secondary_fraction)
             self.main_fraction/=self.secondary_fraction
 
 
