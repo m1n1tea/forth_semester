@@ -31,6 +31,7 @@
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton{
+	 max-hegiht: 75px;
 	 border-style: outset;
      border-width: 3px;
      border-radius: 10px;
@@ -39,6 +40,7 @@
 	 font: bold 36px;
 }
 QPushButton:pressed{
+	max-hegiht: 75px;
 	 border-style: outset;
      border-width: 3px;
      border-radius: 10px;
@@ -47,6 +49,7 @@ QPushButton:pressed{
 	 font: bold 36px;
 }
 QPushButton:!enabled{
+	max-hegiht: 75px;
 	 border-style: outset;
      border-width: 3px;
      border-radius: 10px;
@@ -354,7 +357,7 @@ QLabel{
         <item row="0" column="3">
          <widget class="QPushButton" name="pushButton_13">
           <property name="text">
-           <string>C</string>
+           <string>Clear</string>
           </property>
          </widget>
         </item>
@@ -378,7 +381,7 @@ QLabel{
          </widget>
         </item>
         <item row="5" column="4">
-         <widget class="QPushButton" name="pushButton_1">
+         <widget class="QPushButton" name="pushButton_2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
             <horstretch>0</horstretch>
