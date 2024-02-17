@@ -123,5 +123,3 @@ class CalculatorLogic:
             return frac_to_str(self.main_fraction,self.number_system,self.max_number_len)
         else:
             return frac_to_str(self.secondary_fraction, self.number_system, self.max_number_len)
-
-print(frac_to_str(Fraction(0),10,30))
