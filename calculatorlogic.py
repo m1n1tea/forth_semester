@@ -38,7 +38,8 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
     if is_negative:
         res+='-'
     res=res[::-1]
-
+    if (len(res)==0):
+        res+='0'
     if (len(res)+1<max_len and num!=0):
         res+='.'
     while (len(res)<max_len and num!=0):
@@ -65,6 +66,7 @@ class CalculatorLogic:
         self.number_system=int(number_system)
 
     def input_number(self, number : str):
+        print(number)
         dot_index=number.find('.')
         num=0
         denom=1
@@ -72,6 +74,8 @@ class CalculatorLogic:
             pass
         elif (dot_index==-1):
             num=int(number,self.number_system)
+        elif number[-1]=='.':
+            num = int(number[:-1], self.number_system)
         else:
             (integer_part,fractional_part)=number.split('.')
             denom = self.number_system**len(fractional_part)
@@ -114,3 +118,10 @@ class CalculatorLogic:
         return frac_to_str(self.main_fraction,self.number_system,self.max_number_len)
     def get_secondary_fraction(self) -> str :
         return frac_to_str(self.secondary_fraction,self.number_system,self.max_number_len)
+    def get_input_fraction(self) -> str :
+        if self.input_fraction == "main":
+            return frac_to_str(self.main_fraction,self.number_system,self.max_number_len)
+        else:
+            return frac_to_str(self.secondary_fraction, self.number_system, self.max_number_len)
+
+print(frac_to_str(Fraction(0),10,30))

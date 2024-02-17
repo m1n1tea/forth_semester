@@ -119,8 +119,8 @@ class DigitCommand(Command):
     def changeTo(self, other:str):
         self.number = int(other, numberSystemLine.current_number_system)
         mainCommandLine.appendDigit(other)
-        super().changeTo(other)
         calculator_logic.input_number(mainCommandLine.getText())
+        super().changeTo(other)
 
     def get(self) -> int:
         return self.number
@@ -174,10 +174,7 @@ class OperationCommand(Command):
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
 
-        if calculator_logic.input_fraction=="main":
-            OperationQueue.appendToQueue(calculator_logic.get_main_fraction() + self.get())
-        else:
-            OperationQueue.appendToQueue(calculator_logic.get_secondary_fraction() + self.get())
+        OperationQueue.appendToQueue(calculator_logic.get_input_fraction() + self.get())
         calculator_logic.input_operator(other)
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
@@ -200,6 +197,7 @@ class BackspaceCommand(Command):
             mainCommandLine.setText(mainCommandLine.getText()[0:-1])
             if mainCommandLine.isEmpty():
                 mainCommandLine.setText("0")
+            calculator_logic.input_number(mainCommandLine.getText())
         super().changeTo(other)
     
     def get(self):
@@ -212,10 +210,7 @@ class EqualCommand(Command):
 
     def changeTo(self, other: str) -> None:
         if not mainCommandLine.isEmpty():
-            if calculator_logic.input_fraction == "main":
-                OperationQueue.appendToQueue(calculator_logic.get_main_fraction() + self.get())
-            else:
-                OperationQueue.appendToQueue(calculator_logic.get_secondary_fraction() + self.get())
+            OperationQueue.appendToQueue(calculator_logic.get_input_fraction() + self.get())
         elif not OperationQueue.isEmpty():
             OperationQueue.appendToQueue(self.get())
 
@@ -231,10 +226,8 @@ class EqualCommand(Command):
         
         
         historyCommandLine.setText(OperationQueue.queue)
-        mainCommandLine.clear()
         result= calculate(OperationQueue.queue)
         mainCommandLine.setText(result)
-        mainCommandLine.changeBase(mainCommandLine.base)
         OperationQueue.clearQueue()
         #OperationQueue.appendToQueue(result)
         super().changeTo(other)
@@ -272,10 +265,9 @@ class CommandFactory:
             return BackspaceCommand(command)
         elif command == "CE":
             mainCommandLine.setText("0")
-            return BackspaceCommand(command)
+            calculator_logic.input_number(mainCommandLine.getText())
         elif command =="." and mainCommandLine.getText().find(".")==-1:
-            mainCommandLine.setText(mainCommandLine.getText()+"..")
-            return BackspaceCommand(command)
+            mainCommandLine.setText(mainCommandLine.getText()+".")
 
 
 def findChildOfAName(parent, type, name: str):
