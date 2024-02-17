@@ -161,6 +161,8 @@ class CalculatorLogic:
             self.main_fraction*=self.secondary_fraction
         if self.operator_symbol=='/' and self.secondary_fraction!=0:
                 self.main_fraction/=self.secondary_fraction
+        if self.is_time==1:
+            self.main_fraction=math.floor(self.main_fraction)
         if operator_symbol=="=" and self.is_time==1 and self.main_fraction>24*3600:
             self.main_fraction %=24 * 3600
 
