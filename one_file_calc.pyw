@@ -3,14 +3,11 @@
 #Воеводин Егор
 #Нейман Алексей
 
-from calculatorlogic import *
 from PyQt6 import uic, QtGui, QtWidgets, QtCore
 from PyQt6.QtWidgets import *
 from enum import * 
 
 from PyQt6.QtGui import QKeySequence, QKeyEvent, QShortcut
-from PyQt6 import QtCore
-
 # Form implementation generated from reading ui file 'calculator.ui'
 #
 # Created by: PyQt6 UI code generator 6.6.1
@@ -770,7 +767,7 @@ mainCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "result
 historyCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "previous_input"))
 numberSystemLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "label"))
 
-calculator_logic = calculatorlogic.CalculatorLogic()
+calculator_logic = CalculatorLogic()
 
 
 buttonLayout : QGridLayout = findChildOfAName(form.whole_calculator, QWidget, "buttons").layout()
