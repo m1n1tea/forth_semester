@@ -173,7 +173,6 @@ class OperationCommand(Command):
             case _:
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
-        print(mainCommandLine.getText())
 
         if calculator_logic.input_fraction=="main":
             OperationQueue.appendToQueue(calculator_logic.get_main_fraction() + self.get())
@@ -355,6 +354,5 @@ for i in range (chars.count()):
     button.clicked.connect(lambda checked, text=button.text(): CommandFactory.constructFromString(text))
     button.setDisabled(True)
 
-print(buttonLayout.rowCount(), buttonLayout.columnCount())
 window.show()
 app.exec()

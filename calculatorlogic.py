@@ -85,9 +85,6 @@ class CalculatorLogic:
             self.main_fraction = Fraction(num,denom)
         if self.input_fraction == "secondary":
             self.secondary_fraction = Fraction(num, denom)
-        print(self.main_fraction)
-        print(self.secondary_fraction)
-        print(self.input_fraction)
 
     def input_operator(self, operator_symbol : str):
 
@@ -111,9 +108,6 @@ class CalculatorLogic:
                 self.main_fraction/=self.secondary_fraction
 
         self.operator_symbol = operator_symbol
-        print(self.main_fraction)
-        print(self.secondary_fraction)
-        print(self.input_fraction)
 
 
     def get_main_fraction(self) -> str :
