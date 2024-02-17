@@ -76,6 +76,15 @@ QLabel{
 	 font: bold 36px;
 }
 
+QSlider:!enabled{
+	 border-style: outset;
+     border-width: 3px;
+     border-radius: 10px;
+     border-color: black;
+	 background-color: gray;
+	 font: bold 36px;
+}
+
 </string>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -123,6 +132,9 @@ QLabel{
      </item>
      <item>
       <widget class="QSlider" name="horizontalSlider">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="minimum">
         <number>2</number>
        </property>
@@ -171,7 +183,7 @@ QLabel{
           </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>100</width>
             <height>75</height>
            </size>
           </property>
@@ -288,7 +300,7 @@ QLabel{
           </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>100</width>
             <height>75</height>
            </size>
           </property>
@@ -441,7 +453,7 @@ QLabel{
         <item row="0" column="1">
          <widget class="QPushButton" name="button_sp">
           <property name="text">
-           <string>SP</string>
+           <string>Time</string>
           </property>
          </widget>
         </item>

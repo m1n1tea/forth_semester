@@ -4,7 +4,6 @@
 #Нейман Алексей
 
 import calculatorlogic
-from calculatorlogic import *
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from enum import * 
@@ -73,7 +72,10 @@ class CommandLine:
         self.__line.setText(text)
 
     def clear(self):
-        self.setText("0")
+        if calculator_logic.is_time==0:
+            self.setText("0")
+        else:
+            self.setText("__:__:__")
 
     def changeBase(self, new_base: int):
         calculator_logic.input_number_system(new_base)
@@ -117,8 +119,13 @@ class DigitCommand(Command):
         self.changeTo(default)
 
     def changeTo(self, other:str):
-        self.number = int(other, numberSystemLine.current_number_system)
-        mainCommandLine.appendDigit(other)
+        if (calculator_logic.is_time== 1):
+            if mainCommandLine.getText().find("_")==-1:
+                return
+            mainCommandLine.setText(mainCommandLine.getText().replace("_",other,1))
+        else:
+            self.number = int(other, numberSystemLine.current_number_system)
+            mainCommandLine.appendDigit(other)
         calculator_logic.input_number(mainCommandLine.getText())
         super().changeTo(other)
 
@@ -174,7 +181,7 @@ class OperationCommand(Command):
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
 
-        OperationQueue.appendToQueue(calculator_logic.get_input_fraction() + self.get())
+        OperationQueue.appendToQueue(calculator_logic.get_input_fraction().replace("_","0")  + self.get())
         calculator_logic.input_operator(other)
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
@@ -193,7 +200,15 @@ class BackspaceCommand(Command):
         self.changeTo(something)
 
     def changeTo(self, other: str) -> None:
-        if not mainCommandLine.isEmpty():
+        if calculator_logic.is_time==1:
+            arr=list(mainCommandLine.getText())
+            for i in range(7,-1,-1):
+                if arr[i].isdigit():
+                    arr[i]="_"
+                    break
+            mainCommandLine.setText("".join(arr))
+
+        elif not mainCommandLine.isEmpty():
             mainCommandLine.setText(mainCommandLine.getText()[0:-1])
             if mainCommandLine.isEmpty():
                 mainCommandLine.setText("0")
@@ -210,7 +225,7 @@ class EqualCommand(Command):
 
     def changeTo(self, other: str) -> None:
         if not mainCommandLine.isEmpty():
-            OperationQueue.appendToQueue(calculator_logic.get_input_fraction() + self.get())
+            OperationQueue.appendToQueue(calculator_logic.get_input_fraction().replace("_","0") + self.get())
         elif not OperationQueue.isEmpty():
             OperationQueue.appendToQueue(self.get())
 
@@ -258,6 +273,7 @@ class CommandFactory:
         elif OperationCommand.checkIfPossible(command):
             return OperationCommand(command)
         elif command == "Clear":
+            calculator_logic.input_number("")
             return ClearCommand()
         elif command == "=":
             return EqualCommand(command)
@@ -265,9 +281,13 @@ class CommandFactory:
             return BackspaceCommand(command)
         elif command == "CE":
             mainCommandLine.setText("0")
-            calculator_logic.input_number(mainCommandLine.getText())
+            calculator_logic.input_number("0")
         elif command =="." and mainCommandLine.getText().find(".")==-1:
             mainCommandLine.setText(mainCommandLine.getText()+".")
+        elif command=="Time":
+            calculator_logic.switch_time()
+            onSliderValueChange(str(slider.value()))
+            mainCommandLine.setText(calculator_logic.get_input_fraction())
 
 
 def findChildOfAName(parent, type, name: str):
@@ -290,7 +310,7 @@ form.setupUi(window)
 
 mainCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "result"))
 historyCommandLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "previous_input"))
-numberSystemLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "label"))
+numberSystemLine.setLabel(findChildOfAName(form.whole_calculator, QLabel, "number_system"))
 
 calculator_logic = calculatorlogic.CalculatorLogic()
 
@@ -309,7 +329,7 @@ def onSliderValueChange(new_value: str):
                 button = buttonLayout.itemAtPosition(column_index, row_index).widget()
                 if isinstance(button, QPushButton) and not button.text().isdigit():
                     continue
-                if isinstance(button, QPushButton) and int(button.text()) < int(new_value):
+                if (isinstance(button, QPushButton) and int(button.text()) < int(new_value)) or calculator_logic.is_time==1:
                     button.setEnabled(True)
                     #button.setStyleSheet("background-color: gray")
                 elif int(button.text()) >= int(new_value):
@@ -317,7 +337,7 @@ def onSliderValueChange(new_value: str):
     for i in range (chars.count()):
         button = chars.itemAt(i).widget()
         result = list(DigitCommand.digitsAfter9).index(button.text().lower())
-        if (result +  10 < int(new_value)):
+        if (result +  10 < int(new_value) and calculator_logic.is_time==0):
             chars.itemAt(5 - result).widget().setEnabled(True)
         else:
             chars.itemAt(5 - result).widget().setEnabled(False)
