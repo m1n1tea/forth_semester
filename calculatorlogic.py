@@ -1,5 +1,11 @@
-from fractions import Fraction
+#БПМ-22-4:
+#Макуров Михаил
+#Воеводин Егор
+#Нейман Алексей
 
+
+from fractions import Fraction
+import math
 
 def digit_to_char(digit):
     if digit < 10:
@@ -17,6 +23,12 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
         num*=-1
 
     integer_part = num//denom
+    cnt_dgt = 0
+    if integer_part!=0:
+        cnt_dgt=math.floor(math.log(integer_part,number_system))
+        if (cnt_dgt>=9):
+            denom*=number_system**cnt_dgt
+            integer_part = num // denom
     num-=integer_part*denom
 
     while (len(res)<max_len and integer_part!=0):
@@ -26,8 +38,7 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
     if is_negative:
         res+='-'
     res=res[::-1]
-    if (len(res)==0):
-        res+='0'
+
     if (len(res)+1<max_len and num!=0):
         res+='.'
     while (len(res)<max_len and num!=0):
@@ -35,8 +46,10 @@ def frac_to_str( fraction : Fraction, number_system : int, max_len : int)->str:
         d=num//denom
         num-=d*denom
         res+=digit_to_char(d)
-
-    return res
+    if cnt_dgt<9:
+        return res
+    else:
+        return res + "e" + str(cnt_dgt)
 
 
 class CalculatorLogic:
@@ -94,8 +107,8 @@ class CalculatorLogic:
             self.main_fraction=abs(self.main_fraction-self.secondary_fraction)
         if self.operator_symbol=='*':
             self.main_fraction*=self.secondary_fraction
-        if self.operator_symbol=='/':
-            self.main_fraction/=self.secondary_fraction
+        if self.operator_symbol=='/' and self.secondary_fraction!=0:
+                self.main_fraction/=self.secondary_fraction
 
         self.operator_symbol = operator_symbol
         print(self.main_fraction)

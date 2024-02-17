@@ -1,3 +1,8 @@
+#БПМ-22-4:
+#Макуров Михаил
+#Воеводин Егор
+#Нейман Алексей
+
 import calculatorlogic
 from calculatorlogic import *
 from PyQt6 import uic
@@ -11,40 +16,43 @@ from PyQt6 import QtCore
 class Command:
     @staticmethod
     def lStripZero(number: str) -> str:
-        return number.lstrip('0') 
+        dot_index=number.find(".")
+        if dot_index==-1:
+            return number.lstrip('0')
+        return number[:dot_index-1].lstrip('0')+number[dot_index-1:]
 
     @staticmethod
     # Repair after
     def separateNumber(number: str) -> str:
         return number
-    
+
     def changeTo(self, other: str) -> None:
         commandHistory.push(self)
 
     def get(self):
         pass
 
-class CommandHistory:         
+class CommandHistory:
     def push(self, command: Command):
         self.__commands.append(command)
-    
+
     def top(self) -> Command | None:
         if len(self.__commands) > 0:
             return self.__commands[-1]
         return None
-    
-    def getCurrentCommand(self) -> Command: 
+
+    def getCurrentCommand(self) -> Command:
         return self.top()
-    
+
     # Returns the last command used
     def pop(self) -> Command:
         last_command_used: Command = self.top()
         self.__commands.pop()
         return last_command_used
-    
+
     def debugGetCommands(self):
         return self.__commands
-    
+
     __commands: list[Command] = []
 
 
@@ -54,16 +62,16 @@ class CommandLine:
 
     def isEmpty(self) -> bool:
         return len(Command.lStripZero(self.getText())) == 0
-    
+
     def setLabel(self, label: QLabel):
         self.__line = label
-    
+
     def appendDigit(self, digit: int):
-        self.setText(Command.separateNumber(Command.lStripZero(self.__line.text() + str(digit))))
-        
+        self.setText(Command.separateNumber(Command.lStripZero(self.__line.text()) + str(digit)))
+
     def setText(self, text: str):
         self.__line.setText(text)
-     
+
     def clear(self):
         self.setText("0")
 
@@ -71,7 +79,7 @@ class CommandLine:
         calculator_logic.input_number_system(new_base)
         self.base = new_base
         self.__line.setText(calculator_logic.get_main_fraction())
-        
+
     def getText(self) -> str:
         return self.__line.text()
 
@@ -92,16 +100,17 @@ mainCommandLine : CommandLine = CommandLine()
 historyCommandLine : CommandLine = CommandLine()
 numberSystemLine : NumberSystemLine = NumberSystemLine()
 
-class DigitCommand(Command): 
+class DigitCommand(Command):
     digitsAfter9={"a", "b", "c", "d", "e", "f"}
 
     @staticmethod
     def checkIfAvailable(command:str) -> bool:
-        for i in range(len(command)):
-            if not (command[i].isdigit() or command[i] in DigitCommand.digitsAfter9):
-                return False
+        if len(command)>1:
+            return False
+        if not (command[0].isdigit() or command[0] in DigitCommand.digitsAfter9):
+            return False
         return True
-    
+
     def __init__(self):
         pass
     def __init__(self, default):
@@ -112,12 +121,12 @@ class DigitCommand(Command):
         mainCommandLine.appendDigit(other)
         super().changeTo(other)
         calculator_logic.input_number(mainCommandLine.getText())
-       
-    def get(self) -> int: 
+
+    def get(self) -> int:
         return self.number
-    
+
     number : int = 0
-   
+
 class OperationQueue:
     @staticmethod
     def appendToQueue(text : str):
@@ -165,9 +174,12 @@ class OperationCommand(Command):
                 raise ValueError(other + " was not one of Possible Operations")
         super().changeTo(other)
         print(mainCommandLine.getText())
-        calculator_logic.input_number(mainCommandLine.getText())
+
+        if calculator_logic.input_fraction=="main":
+            OperationQueue.appendToQueue(calculator_logic.get_main_fraction() + self.get())
+        else:
+            OperationQueue.appendToQueue(calculator_logic.get_secondary_fraction() + self.get())
         calculator_logic.input_operator(other)
-        OperationQueue.appendToQueue(str(mainCommandLine.getText()) + self.get())
         historyCommandLine.setText(OperationQueue.queue)
         mainCommandLine.clear()
 
@@ -200,13 +212,15 @@ class EqualCommand(Command):
         self.changeTo(operation)
 
     def changeTo(self, other: str) -> None:
-        calculator_logic.input_number(mainCommandLine.getText())
-        calculator_logic.input_operator('=')
         if not mainCommandLine.isEmpty():
-            OperationQueue.appendToQueue(str(mainCommandLine.getText()) + self.get())
+            if calculator_logic.input_fraction == "main":
+                OperationQueue.appendToQueue(calculator_logic.get_main_fraction() + self.get())
+            else:
+                OperationQueue.appendToQueue(calculator_logic.get_secondary_fraction() + self.get())
         elif not OperationQueue.isEmpty():
             OperationQueue.appendToQueue(self.get())
 
+        calculator_logic.input_operator('=')
         # Here we delete a sign if the last command was something of a "+, -, /, *", since we do not
         # want to find something like: "65-=65"
         if isinstance(commandHistory.top(), OperationCommand):
@@ -246,6 +260,7 @@ class CommandFactory:
     
     @staticmethod
     def constructFromString(command: str) -> Command:
+
         if DigitCommand.checkIfAvailable(command.lower()):
             return DigitCommand(command)
         elif OperationCommand.checkIfPossible(command):
@@ -256,6 +271,13 @@ class CommandFactory:
             return EqualCommand(command)
         elif command == "⌫":
             return BackspaceCommand(command)
+        elif command == "CE":
+            mainCommandLine.setText("0")
+            return BackspaceCommand(command)
+        elif command =="." and mainCommandLine.getText().find(".")==-1:
+            mainCommandLine.setText(mainCommandLine.getText()+"..")
+            return BackspaceCommand(command)
+
 
 def findChildOfAName(parent, type, name: str):
     children = parent.findChildren(type)
