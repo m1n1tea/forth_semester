@@ -224,6 +224,8 @@ class EqualCommand(Command):
         self.changeTo(operation)
 
     def changeTo(self, other: str) -> None:
+        if isinstance(commandHistory.top(), EqualCommand):
+            return
         if not mainCommandLine.isEmpty():
             OperationQueue.appendToQueue(calculator_logic.get_input_fraction().replace("_","0") + self.get())
         elif not OperationQueue.isEmpty():
@@ -235,9 +237,7 @@ class EqualCommand(Command):
         if isinstance(commandHistory.top(), OperationCommand):
             temp_str = OperationQueue.queue 
             OperationQueue.clearQueue()
-            OperationQueue.appendToQueue(temp_str[0:-2] + self.get()) 
-        elif isinstance(commandHistory.top(), EqualCommand):
-            return      
+            OperationQueue.appendToQueue(temp_str[0:-2] + self.get())
         
         
         historyCommandLine.setText(OperationQueue.queue)

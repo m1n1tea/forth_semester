@@ -75,7 +75,7 @@ class CalculatorLogic:
         self.operator_symbol = 'c' # +,-,*,/,= - easy, c - clear all(except number system)
         self.input_fraction = "main"  # main - main_fraction, secondary - secondary_fraction
         self.number_system = 10
-        self.max_number_len = 10
+        self.max_number_len = 100
         self.is_time=0
 
     def input_number_system(self, number_system):
