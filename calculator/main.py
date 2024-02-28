@@ -327,6 +327,12 @@ def onSliderValueChange(new_value: str):
         for column_index in range(buttonLayout.columnCount() + 2):
             if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
                 button = buttonLayout.itemAtPosition(column_index, row_index).widget()
+                if isinstance(button, QPushButton) and button.text()==".":
+                    if calculator_logic.is_time==1:
+                        button.setDisabled(True)
+                    else:
+                        button.setEnabled(True)
+
                 if isinstance(button, QPushButton) and not button.text().isdigit():
                     continue
                 if (isinstance(button, QPushButton) and int(button.text()) < int(new_value)) or calculator_logic.is_time==1:
@@ -350,7 +356,7 @@ for row_index in range(buttonLayout.rowCount()):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                    
+                    print(button.text)
                     if (button.text == "⌫"):
                         # Does not work forsome reason
                         button.shortcut = QShortcut(QtCore.Qt.Key.Key_Backspace, button)

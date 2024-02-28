@@ -898,6 +898,12 @@ def onSliderValueChange(new_value: str):
         for column_index in range(buttonLayout.columnCount() + 2):
             if buttonLayout.itemAtPosition(column_index, row_index) is not None:
                 button = buttonLayout.itemAtPosition(column_index, row_index).widget()
+                if isinstance(button, QPushButton) and button.text()==".":
+                    if calculator_logic.is_time==1:
+                        button.setDisabled(True)
+                    else:
+                        button.setEnabled(True)
+
                 if isinstance(button, QPushButton) and not button.text().isdigit():
                     continue
                 if (isinstance(button, QPushButton) and int(button.text()) < int(
