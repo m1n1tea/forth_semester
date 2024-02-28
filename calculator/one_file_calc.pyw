@@ -930,7 +930,7 @@ for row_index in range(buttonLayout.rowCount()):
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
 
-                if (button.text == "⌫"):
+                if (button.text() == "⌫"):
                     # Does not work forsome reason
                     button.shortcut = QShortcut(QtCore.Qt.Key.Key_Backspace, button)
                 else:
