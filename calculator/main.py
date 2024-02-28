@@ -356,9 +356,7 @@ for row_index in range(buttonLayout.rowCount()):
         if buttonLayout.itemAtPosition(column_index, row_index) is not None:  
             button = buttonLayout.itemAtPosition(column_index, row_index).widget()
             if isinstance(button, QPushButton):
-                    print(button.text)
-                    if (button.text == "⌫"):
-                        # Does not work forsome reason
+                    if (button.text() == "⌫"):
                         button.shortcut = QShortcut(QtCore.Qt.Key.Key_Backspace, button)
                     else:
                         button.shortcut = QShortcut(QKeySequence(button.text()), button)
