@@ -4,11 +4,12 @@ import math
 #helper functions
 def check_value(n, n_name):
     if not n >= 0:
-        raise ValueError(n_name + " must be >= 0")
+        return (n_name + " must be >= 0")
     if math.floor(n) != n:
-        raise ValueError(n_name + " must be exact integer")
+        return (n_name + " must be exact integer")
     if n+1 == n:  # catch a value like 1e300
-        raise OverflowError(n_name + " too large")
+        return (n_name + " is too large")
+    return ""
 def factorial(n):
 
     result = 1
@@ -29,31 +30,43 @@ def factorial_division(n,m): # if m>=n returns 1
 
 #main functions
 def sum_rule(n ,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     return n+m;
 def prod_rule(n ,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     return n*m;
 def placement_w_rep(n,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     return n**m;
 def placement_wo_rep(n,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     if m>n:
         return 0
     return factorial_division(n,n-m);
 
 def combinations_w_rep(n,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     return combinations_wo_rep(n+m-1,m)
 def combinations_wo_rep(n,m):
-    check_value(n,"n")
-    check_value(m,"m")
+    if check_value(n,"n")!="":
+        return check_value(n,"n")
+    if check_value(m, "m") != "":
+        return check_value(m, "m")
     if m>n:
         return 0
     if n-m>m:
@@ -62,7 +75,8 @@ def combinations_wo_rep(n,m):
 
 def permutations_w_rep(arr_n): #arr_n - array of integers
     for i in range(len(arr_n)):
-        check_value(arr_n[i], "n"+str(i+1))
+        if check_value(arr_n[i], "n"+str(i+1)) != "":
+            return check_value(arr_n[i], "n"+str(i+1))
     sum_n=0
     for x in arr_n:
         sum_n+=x
@@ -76,7 +90,8 @@ def permutations_w_rep(arr_n): #arr_n - array of integers
     return result
 
 def permutations_wo_rep(n):
-    check_value(n, "n")
+    if check_value(n, "n") != "":
+        return check_value(n, "n")
     return factorial(n);
 
 #tests
