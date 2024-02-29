@@ -214,10 +214,10 @@ if __name__ == "__main__":
                 print(f"{n} * {m} = {prod_rule(n, m)}")
             case Options.COMBINATIONS_WITH_REPETITION.value:
                 n, m = query2Arguments()
-                print(f"m = {m} сочетний с повторениями из n = {n} элементов = {combinations_w_rep(n, m)}")
+                print(f"m = {m} сочетаний с повторениями из n = {n} элементов = {combinations_w_rep(n, m)}")
             case Options.COMBINATIONS_WITH_REPETITION.value:
                 n, m = query2Arguments()
-                print(f"m = {m} сочетний без повторений из n = {n} элементов = {combinations_wo_rep(n, m)}")
+                print(f"m = {m} сочетаний без повторений из n = {n} элементов = {combinations_wo_rep(n, m)}")
             case Options.PERMUTATIONS_WITHOUT_REPETITION.value:
                 n: int = query1Argument()
                 print(f"n = {n} перестановок без повторений = {permutations_wo_rep(n)}")
