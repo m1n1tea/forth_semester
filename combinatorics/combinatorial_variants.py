@@ -4,7 +4,7 @@ import enum
 
 
 #helper functions
-def check_value(n : int, n_name : int):
+def check_value(n : int, n_name : str):
     if not n >= 0:
         return (n_name + " must be >= 0")
     if math.floor(n) != n:
@@ -125,6 +125,8 @@ class Options(enum.Enum):
     PLACEMENT_WITHOUT_REPETITION = 4
     COMBINATIONS_WITH_REPETITION = 5
     COMBINATIONS_WITHOUT_REPETITION = 6
+    PERMUTATIONS_WITH_REPETITION = 7
+    PERMUTATIONS_WITHOUT_REPETITION = 8
     QUIT = 9
 
 
@@ -137,19 +139,52 @@ def printOptions() -> None:
     print(f"Для вывода размещений без повторений введите: {Options.PLACEMENT_WITHOUT_REPETITION.value}")
     print(f"Для вывода сочетаний с повторениями введите: {Options.COMBINATIONS_WITH_REPETITION.value}")
     print(f"Для вывода сочетаний без повторений введите: {Options.COMBINATIONS_WITHOUT_REPETITION.value}")    
+    print(f"Для вывода перестановок с повторениями введите: {Options.PERMUTATIONS_WITH_REPETITION.value}")
+    print(f"Для вывода перестановок без повторений введите: {Options.PERMUTATIONS_WITHOUT_REPETITION.value}")  
     print(f"Чтобы выйти введите: {Options.QUIT.value}")
 
 def queryNArguments(number_of_arguments: int) -> list[int]:
     for i in range(number_of_arguments):
         print(f"Пожалуйста, ")
 
+def queryUndefArguments() -> list[int]:
+    query : list[int] = []
+    while True:
+        inp = input()
+        if inp == '':
+            break
+        try: 
+            query.append(int(inp))
+        except Exception:
+            print("Введите целое число!")
+    return query
 
 def query2Arguments() -> tuple[int, int]:
     print("Пожалуйста, введите n: ")
-    n: int = int(input())
+    while True:
+        try:
+            n: int = int(input())
+            break
+        except Exception:
+            print("Введите целое число!")
     print("Пожалуйста, введите m: ")
-    m: int = int(input()) 
+    while True:
+        try:
+            m: int = int(input())
+            break 
+        except Exception:
+            print("Введите целое число!")
     return (n, m)
+
+def query1Argument() -> int:
+    print("Пожалуйста, введите n: ")
+    while True:
+        try:
+            n: int = int(input())
+            break
+        except Exception:
+            print("Введите целое число!")
+    return n
 
 if __name__ == "__main__":
     should_quit: bool = False
@@ -167,10 +202,10 @@ if __name__ == "__main__":
                 should_quit = True
             case Options.PLACEMENT_WITH_REPETITION.value:
                 n, m  = query2Arguments()
-                print(f"{m} размещений с повторениями из {n} элементов = {placement_w_rep(n, m)}")
+                print(f"m = {m} размещений с повторениями из n = {n} элементов = {placement_w_rep(n, m)}")
             case Options.PLACEMENT_WITHOUT_REPETITION.value: 
                 n, m = query2Arguments()
-                print(f"{m} размещений без повторений из {n} элементов = {placement_wo_rep(n, m)}")
+                print(f"m = {m} размещений без повторений из n = {n} элементов = {placement_wo_rep(n, m)}")
             case Options.SUM_RULE.value:
                 n, m = query2Arguments()
                 print(f"{n} + {m} = {sum_rule(n, m)}")
@@ -179,7 +214,13 @@ if __name__ == "__main__":
                 print(f"{n} * {m} = {prod_rule(n, m)}")
             case Options.COMBINATIONS_WITH_REPETITION.value:
                 n, m = query2Arguments()
-                print(f"{m} сочетний с повторениями из {n} элементов = {combinations_w_rep(n, m)}")
+                print(f"m = {m} сочетний с повторениями из n = {n} элементов = {combinations_w_rep(n, m)}")
             case Options.COMBINATIONS_WITH_REPETITION.value:
                 n, m = query2Arguments()
-                print(f"{m} сочетний без повторений из {n} элементов = {combinations_wo_rep(n, m)}")
+                print(f"m = {m} сочетний без повторений из n = {n} элементов = {combinations_wo_rep(n, m)}")
+            case Options.PERMUTATIONS_WITHOUT_REPETITION.value:
+                n: int = query1Argument()
+                print(f"n = {n} перестановок без повторений = {permutations_wo_rep(n)}")
+            case Options.PERMUTATIONS_WITH_REPETITION.value:
+                n_list: list[int] = queryUndefArguments()
+                print(f"{n_list} перестановок с повторениями = {permutations_w_rep(n_list)}")
