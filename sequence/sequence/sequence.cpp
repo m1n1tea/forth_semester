@@ -295,7 +295,6 @@ int main() {
     bool stop = 0;
     //Все новые массивы добавляются к концу двумерного массива.
     while (!stop) {
-
         int command_type = 0;
         std::cin >> command_type;
         bool bad_number = 0;
@@ -367,8 +366,12 @@ int main() {
             }
         }
         catch(const std::exception& e){
+            std::cin.clear();
+            std::cin.ignore(INT_MAX, '\n');
             std::cout << "Exception: " << e.what() << "\n";
         }
+        std::cin.clear();
+        std::cin.ignore(INT_MAX, '\n');
         if (bad_number) {
             std::cout << "Bad input\n";
             continue;
