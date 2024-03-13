@@ -278,23 +278,24 @@ int main() {
     arrays[0][2] = "3rd_element";
     std::cout << "Starting array of strings:\n";
     printArray(arrays[0]);
+	std::cout << "Write number from 1 to 12\n";
+	std::cout << "1. Print active array\n";
+	std::cout << "2. Print all arrays\n";
+	std::cout << "3. Change element's value\n";
+	std::cout << "4. Insert element\n";
+	std::cout << "5. Remove element\n";
+	std::cout << "6. Resize array\n";
+	std::cout << "7. Create new array\n";
+	std::cout << "8. Switch active array\n";
+	std::cout << "9. Copy one array to another\n";
+	std::cout << "10. Move one array to another\n";
+	std::cout << "11. Duplicate active array\n";
+	std::cout << "12. Finish program\n";
     int active_array_index = 0;
     bool stop = 0;
     //Все новые массивы добавляются к концу двумерного массива.
     while (!stop) {
-        std::cout << "Write number from 1 to 12\n";
-        std::cout << "1. Print active array\n";
-        std::cout << "2. Print all arrays\n";
-        std::cout << "3. Change element's value\n";
-        std::cout << "4. Insert element\n";
-        std::cout << "5. Remove element\n";
-        std::cout << "6. Resize array\n";
-        std::cout << "7. Create new array\n";
-        std::cout << "8. Switch active array\n";
-        std::cout << "9. Copy one array to another\n";
-        std::cout << "10. Move one array to another\n";
-        std::cout << "11. Duplicate active array\n";
-        std::cout << "12. Finish program\n";
+
         int command_type = 0;
         std::cin >> command_type;
         bool bad_number = 0;
@@ -372,7 +373,6 @@ int main() {
             std::cout << "Bad input\n";
             continue;
         }
-        std::cout << "\n";
 
 
 
