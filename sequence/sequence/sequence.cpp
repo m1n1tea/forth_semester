@@ -15,24 +15,24 @@ template<typename type>
 class ArrayT {
 public:
     ArrayT();
-    ArrayT(const ArrayT& rhs) noexcept;
-    ArrayT(ArrayT&& rhs) noexcept;
-    explicit ArrayT(const std::ptrdiff_t& size);
-    ArrayT(const std::ptrdiff_t& size, const type& common);
+    ArrayT(const ArrayT& rhs) noexcept;//копирующий конструктор
+    ArrayT(ArrayT&& rhs) noexcept;//перемещающий конструктор
+    explicit ArrayT(const std::ptrdiff_t& size);//массив с предопределённым размером
+    ArrayT(const std::ptrdiff_t& size, const type& common);//массив с предопределённым размером и общим элементом
     ~ArrayT() noexcept;
-    ArrayT& operator=(const ArrayT& rhs) noexcept;
-    ArrayT& operator=(ArrayT&& rhs) noexcept;
-    type& operator[](const std::ptrdiff_t& index);
-    const type& operator[](const std::ptrdiff_t& index) const;
-    std::ptrdiff_t size() const noexcept;
+    ArrayT& operator=(const ArrayT& rhs) noexcept;//копирующий оператор присваивания
+    ArrayT& operator=(ArrayT&& rhs) noexcept;//перемещающий оператор присваивания
+    type& operator[](const std::ptrdiff_t& index);//изменение элемента массива
+    const type& operator[](const std::ptrdiff_t& index) const;//изменение элемента массива
+    std::ptrdiff_t size() const noexcept;//узнать размер массива
 
 
 
-    void resize(const std::ptrdiff_t& new_size);
-    void resize(const std::ptrdiff_t& new_size, const type& common);
-    void insert(const std::ptrdiff_t& index, const type& common);
-    void remove(const std::ptrdiff_t& index);
-    bool empty();
+    void resize(const std::ptrdiff_t& new_size);//изменить размер массива, новые элементы являются значениями по умолчанию класса
+    void resize(const std::ptrdiff_t& new_size, const type& common);//изменить размер массива с заданным значением для новых элементов
+    void insert(const std::ptrdiff_t& index, const type& common);// вставить данный элемент на данную позицию массива
+    void remove(const std::ptrdiff_t& index);// удалить элемент с данной позицией из массива
+    bool empty();//если массив пустой возвращает true, иначе false
 
 
 
