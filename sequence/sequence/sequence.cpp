@@ -45,7 +45,7 @@ private:
 
 void sizeCheck(const std::ptrdiff_t& size) {
     if (size < 0) {
-        throw std::invalid_argument("Array size or change in size is negative");
+        throw std::invalid_argument("Array size is negative");
     }
 }
 
