@@ -148,6 +148,7 @@ def queryNArguments(number_of_arguments: int) -> list[int]:
         print(f"Пожалуйста, ")
 
 def queryUndefArguments() -> list[int]:
+    print("Для завершения нажмите Enter 2 раза")
     query : list[int] = []
     while True:
         inp = input()
@@ -215,7 +216,7 @@ if __name__ == "__main__":
             case Options.COMBINATIONS_WITH_REPETITION.value:
                 n, m = query2Arguments()
                 print(f"m = {m} сочетаний с повторениями из n = {n} элементов = {combinations_w_rep(n, m)}")
-            case Options.COMBINATIONS_WITH_REPETITION.value:
+            case Options.COMBINATIONS_WITHOUT_REPETITION.value:
                 n, m = query2Arguments()
                 print(f"m = {m} сочетаний без повторений из n = {n} элементов = {combinations_wo_rep(n, m)}")
             case Options.PERMUTATIONS_WITHOUT_REPETITION.value:
@@ -223,4 +224,7 @@ if __name__ == "__main__":
                 print(f"n = {n} перестановок без повторений = {permutations_wo_rep(n)}")
             case Options.PERMUTATIONS_WITH_REPETITION.value:
                 n_list: list[int] = queryUndefArguments()
+                if (len(n_list) == 0):
+                    print("Вы ничего не ввели!") 
+                    continue
                 print(f"{n_list} перестановок с повторениями = {permutations_w_rep(n_list)}")
