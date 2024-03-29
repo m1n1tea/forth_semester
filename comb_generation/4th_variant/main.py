@@ -1,3 +1,4 @@
+# БПМ-22-4 Воеводин Егор
 from typing import List, Any
 
 def generate_subsets(set: List[Any]) -> List[List[Any]]:
@@ -13,5 +14,23 @@ def generate_subsets(set: List[Any]) -> List[List[Any]]:
     return subsets + new_subsets
 
 # Пример использования
-set : List[Any] = [1, 2, 3]
-print(generate_subsets(set))
+se : List[Any] = [] 
+print("Введите размер: ")
+should_stop : bool = False
+while not should_stop:
+    try: 
+        n : int = int(input())
+        should_stop = True
+    except:
+        print("Введите число!")
+print("Введите элементы: ")
+for i in range(0, n):
+    should_stop = False
+    while not should_stop:
+        try:
+            se.append(int(input()))
+            should_stop = True
+        except:
+            print("Введите число!")
+print("Полученные множества: ")    
+print(generate_subsets(se))
